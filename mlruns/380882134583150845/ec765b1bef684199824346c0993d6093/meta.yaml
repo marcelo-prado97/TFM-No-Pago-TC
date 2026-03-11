@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Dell/Documents/MASTER%20UNIVERSITARIO/TRABAJO%20FINAL%202/Desarrollo%20TFM/Desarrollo%20TC%20Default/mlruns/380882134583150845/ec765b1bef684199824346c0993d6093/artifacts
+end_time: 1773203600047
+entry_point_name: ''
+experiment_id: '380882134583150845'
+lifecycle_stage: active
+run_id: ec765b1bef684199824346c0993d6093
+run_name: salty-cod-489
+run_uuid: ec765b1bef684199824346c0993d6093
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1773203566995
+status: 3
+tags: []
+user_id: Dell
