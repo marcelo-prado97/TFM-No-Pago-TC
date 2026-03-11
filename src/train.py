@@ -80,6 +80,7 @@ def entrenar():
     x_train, x_test, y_train, y_test = dividir_datos(df)
 
     # MLflow
+    mlflow.set_tracking_uri('mlruns')
     mlflow.set_experiment(EXPERIMENTO)
 
     with mlflow.start_run():
