@@ -68,6 +68,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add models/modelo_rf.pkl mlruns/
+          git add models/modelo_rf.pkl
           git commit -m "chore: reentrenamiento automatico $(date +'%Y-%m-%d %H:%M:%S')" || echo "Sin cambios"
           git push
