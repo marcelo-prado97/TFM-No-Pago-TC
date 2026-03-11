@@ -1,0 +1,72 @@
+name: CI + Reentrenamiento Automatico
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron: '0 */2 * * *'  # Cada 2 horas
+
+jobs:
+
+  # ============================================================
+  # JOB 1: Tests automaticos en cada push
+  # ============================================================
+  tests:
+    name: Ejecutar Tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Verificar que los modulos importan correctamente
+        run: |
+          cd src
+          python -c "from preprocesamiento import preprocesar; print('preprocesamiento OK')"
+          python -c "from predict import cargar_modelo, predecir, calcular_tasa_mora; print('predict OK')"
+
+      - name: Verificar que la API arranca
+        run: |
+          python -c "from api.main import app; print('API OK')"
+
+  # ============================================================
+  # JOB 2: Reentrenamiento cada 2 horas
+  # ============================================================
+  reentrenamiento:
+    name: Reentrenar Modelo
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Reentrenar modelo
+        run: python src/train.py
+
+      - name: Guardar nuevo modelo en repositorio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add models/modelo_rf.pkl mlruns/
+          git commit -m "chore: reentrenamiento automatico $(date +'%Y-%m-%d %H:%M:%S')" || echo "Sin cambios"
+          git push
