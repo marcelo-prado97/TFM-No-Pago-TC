@@ -68,6 +68,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/marcelo-prado97/TFM-No-Pago-TC.git
           git add models/modelo_rf.pkl
           git commit -m "chore: reentrenamiento automatico $(date +'%Y-%m-%d %H:%M:%S')" || echo "Sin cambios"
           git push
