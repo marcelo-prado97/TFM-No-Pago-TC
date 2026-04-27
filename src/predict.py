@@ -1,15 +1,16 @@
 import joblib
 import pandas as pd
 import numpy as np
+import os
 
-RUTA_MODELO = 'models/modelo_rf.pkl'
-UMBRAL_OPTIMO = 0.47
+RUTA_MODELO = os.path.join(os.path.dirname(__file__), '..', 'models', 'modelo_rf.pkl')
+UMBRAL_OPTIMO = 0.41
 
 COLUMNAS_ESPERADAS = [
-    'MONT_CREDIT', 'NIV_EDUC', 'AGE',
-    'PAY_1', 'PAY_2', 'PAY_3',
-    'BILL_AMT1', 'BILL_AMT2', 'BILL_AMT3',
-    'PAY_AMT1', 'PAY_AMT2', 'PAY_AMT3',
+    'LIMIT_BAL', 'EDUCATION', 'AGE',
+    'PAY_1', 'PAY_2', 'PAY_3', 'PAY_4', 'PAY_5', 'PAY_6',
+    'BILL_AMT1', 'BILL_AMT2', 'BILL_AMT3', 'BILL_AMT4', 'BILL_AMT5', 'BILL_AMT6',
+    'PAY_AMT1', 'PAY_AMT2', 'PAY_AMT3', 'PAY_AMT4', 'PAY_AMT5', 'PAY_AMT6',
     'CREDIT_UTIL1', 'DEMORA_SUM', 'DEMORA_MAX',
     'MESES_AL_DIA', 'VARIACION_TOTAL_CUENTA',
     'Civil_Casado', 'Civil_Soltero', 'Civil_Otros',
@@ -44,7 +45,7 @@ def predecir(datos: list[dict], umbral: float = UMBRAL_OPTIMO) -> list[dict]:
     resultados = []
     for i in range(len(df)):
         resultados.append({
-            'ES_NOPAGO': int(es_nopago[i]),
+            'default.payment.next.month': int(es_nopago[i]), 
             'PROBABILIDAD_NOPAGO': round(float(prob_nopago[i]), 6),
             'PROBABILIDAD_SIPAGO': round(float(prob_sipago[i]), 6),
             'TASA_INTERES_MENSUAL': 0.10,
@@ -70,27 +71,31 @@ def calcular_tasa_mora(probabilidad_nopago: float) -> float:
 
 
 if __name__ == '__main__':
-    # Prueba rapida con los datos de ejemplo del notebook
+    # Prueba rapida con datos del dataset de Taiwan
     datos_prueba = [
         {
-            'MONT_CREDIT': 5000, 'NIV_EDUC': 2, 'AGE': 25,
-            'PAY_1': 0, 'PAY_2': 1, 'PAY_3': 0,
-            'BILL_AMT1': 4500, 'BILL_AMT2': 4000, 'BILL_AMT3': 3500,
-            'PAY_AMT1': 2000, 'PAY_AMT2': 1000, 'PAY_AMT3': 1200,
-            'CREDIT_UTIL1': 0.75, 'DEMORA_SUM': 12, 'DEMORA_MAX': 2,
-            'MESES_AL_DIA': 2, 'VARIACION_TOTAL_CUENTA': 1200,
-            'Civil_Casado': 1, 'Civil_Soltero': 0, 'Civil_Otros': 0,
-            'Sexo_Masculino': 1, 'Sexo_Femenino': 0
-        },
-        {
-            'MONT_CREDIT': 2000, 'NIV_EDUC': 1, 'AGE': 45,
-            'PAY_1': 2, 'PAY_2': 2, 'PAY_3': 1,
-            'BILL_AMT1': 3000, 'BILL_AMT2': 2800, 'BILL_AMT3': 2600,
-            'PAY_AMT1': 800, 'PAY_AMT2': 700, 'PAY_AMT3': 600,
-            'CREDIT_UTIL1': 0.90, 'DEMORA_SUM': 5, 'DEMORA_MAX': 2,
-            'MESES_AL_DIA': 0, 'VARIACION_TOTAL_CUENTA': 400,
+            'LIMIT_BAL': 50000, 'EDUCATION': 2, 'AGE': 35,
+            'PAY_1': 0, 'PAY_2': 0, 'PAY_3': 0, 'PAY_4': 0, 'PAY_5': 0, 'PAY_6': 0,
+            'BILL_AMT1': 25000, 'BILL_AMT2': 23000, 'BILL_AMT3': 21000,
+            'BILL_AMT4': 19000, 'BILL_AMT5': 17000, 'BILL_AMT6': 15000,
+            'PAY_AMT1': 2000, 'PAY_AMT2': 1800, 'PAY_AMT3': 1600,
+            'PAY_AMT4': 1400, 'PAY_AMT5': 1200, 'PAY_AMT6': 1000,
+            'CREDIT_UTIL1': 0.50, 'DEMORA_SUM': 0, 'DEMORA_MAX': 0,
+            'MESES_AL_DIA': 6, 'VARIACION_TOTAL_CUENTA': 10000,
             'Civil_Casado': 0, 'Civil_Soltero': 1, 'Civil_Otros': 0,
             'Sexo_Masculino': 0, 'Sexo_Femenino': 1
+        },
+        {
+            'LIMIT_BAL': 20000, 'EDUCATION': 3, 'AGE': 45,
+            'PAY_1': 2, 'PAY_2': 2, 'PAY_3': 1, 'PAY_4': 0, 'PAY_5': 0, 'PAY_6': 0,
+            'BILL_AMT1': 18000, 'BILL_AMT2': 17000, 'BILL_AMT3': 16000,
+            'BILL_AMT4': 15000, 'BILL_AMT5': 14000, 'BILL_AMT6': 13000,
+            'PAY_AMT1': 500, 'PAY_AMT2': 400, 'PAY_AMT3': 300,
+            'PAY_AMT4': 200, 'PAY_AMT5': 100, 'PAY_AMT6': 0,
+            'CREDIT_UTIL1': 0.90, 'DEMORA_SUM': 5, 'DEMORA_MAX': 2,
+            'MESES_AL_DIA': 3, 'VARIACION_TOTAL_CUENTA': 5000,
+            'Civil_Casado': 1, 'Civil_Soltero': 0, 'Civil_Otros': 0,
+            'Sexo_Masculino': 1, 'Sexo_Femenino': 0
         }
     ]
 
