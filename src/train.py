@@ -54,7 +54,10 @@ def buscar_hiperparametros(x_train, y_train) -> RandomForestClassifier:
     )
 
     rf_random.fit(x_train, y_train)
+    # import joblib
+    # best_rf_random = joblib.load('models/modelo_rf.pkl')
     return rf_random.best_estimator_, rf_random.best_params_
+    # return best_rf_random
 
 
 def calcular_metricas(modelo, x_test, y_test, umbral=UMBRAL_OPTIMO) -> dict:
@@ -81,6 +84,7 @@ def entrenar():
     print('\n[1/5] Iniciando preprocesamiento de datos...')
     df = preprocesar(RUTA_DATOS)
     x_train, x_test, y_train, y_test = dividir_datos(df)
+
     print(f'      Dataset cargado: {len(df)} registros')
     print(f'      Train: {len(x_train)} registros | Test: {len(x_test)} registros')
     print('      Preprocesamiento completado ✓')
@@ -99,7 +103,8 @@ def entrenar():
         print('\n[3/5] Entrenando modelo — buscando mejores hiperparámetros...')
         print('      Esto puede tardar varios minutos...')
         mejor_modelo, mejores_params = buscar_hiperparametros(x_train, y_train)
-        print(f'      Mejores hiperparámetros encontrados: {mejores_params}')
+        # mejor_modelo = buscar_hiperparametros(x_train, y_train)
+        #print(f'      Mejores hiperparámetros encontrados: {mejores_params}')
         print('      Entrenamiento completado ✓')
 
         # ==> PASO 4: Evaluacion del modelo

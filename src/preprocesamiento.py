@@ -38,11 +38,11 @@ def limpiar_datos(df: pd.DataFrame) -> pd.DataFrame:
     df['MARRIAGE'] = df['MARRIAGE'].replace({0: 3})
 
     # Eliminar outlier extremo en BILL_AMT1 con criterio 3xIQR
-    Q1 = df['BILL_AMT1'].quantile(0.25)
-    Q3 = df['BILL_AMT1'].quantile(0.75)
-    IQR = Q3 - Q1
-    limite = Q3 + 3 * IQR
-    df = df[df['BILL_AMT1'] <= limite].copy()
+    # Q1 = df['BILL_AMT1'].quantile(0.25)
+    # Q3 = df['BILL_AMT1'].quantile(0.75)
+    # IQR = Q3 - Q1
+    # limite = Q3 + 3 * IQR
+    # df = df[df['BILL_AMT1'] <= limite].copy()
 
     return df
 

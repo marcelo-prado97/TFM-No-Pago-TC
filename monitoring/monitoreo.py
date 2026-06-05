@@ -16,22 +16,44 @@ from sklearn.model_selection import train_test_split
 modelo = joblib.load('models/modelo_rf.pkl')
 
 # ==> Cargar y preprocesar dataset
-df = preprocesar('data/raw/Data_TC.xlsx')
+df = preprocesar('data/raw/UCI_Credit_Card.csv')
 
 # ==> Definir columnas
-TARGET = 'ES_NOPAGO'
-UMBRAL = 0.47
+TARGET = 'default.payment.next.month'
+UMBRAL = 0.41
 features = [col for col in df.columns if col != TARGET]
 
-# ==> Dividir aleatoriamente con estratificacion
-referencia, produccion = train_test_split(
-    df,
+
+X = df[features]
+y = df[TARGET]
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y,
     test_size=0.3,
     random_state=876,
-    stratify=df[TARGET]
+    stratify=y
 )
-referencia = referencia.copy()
-produccion = produccion.copy()
+
+referencia = X_train.copy()
+referencia[TARGET] = y_train.values
+
+produccion = X_test.copy()
+produccion[TARGET] = y_test.values
+
+
+# # ==> Dividir aleatoriamente con estratificacion
+# referencia, produccion = train_test_split(
+#     df,
+#     test_size=0.3,
+#     random_state=876,
+#     stratify=df[TARGET]
+# )
+# referencia = referencia.copy()
+# produccion = produccion.copy()
+
+
+
 
 # ==> Agregar probabilidades y predicciones con umbral correcto
 referencia['prediction'] = (
@@ -48,11 +70,21 @@ column_mapping = ColumnMapping(
     prediction='prediction',
     pos_label=1,
     numerical_features=[col for col in features 
-                        if col not in ['Civil_Casado','Civil_Soltero',
-                                      'Civil_Otros','Sexo_Masculino','Sexo_Femenino']],
-    categorical_features=['Civil_Casado','Civil_Soltero','Civil_Otros',
-                          'Sexo_Masculino','Sexo_Femenino']
+                        if col not in ['Civil_Casado', 'Civil_Soltero',
+                                      'Civil_Otros', 'Sexo_Masculino', 'Sexo_Femenino',
+                                      'EDUCATION']],
+    categorical_features=['Civil_Casado', 'Civil_Soltero', 'Civil_Otros',
+                          'Sexo_Masculino', 'Sexo_Femenino', 'EDUCATION']
 )
+from sklearn.metrics import recall_score, f1_score, roc_auc_score
+y_true_prod = produccion[TARGET]
+y_pred_prod = produccion['prediction']
+y_proba_prod = modelo.predict_proba(produccion[features])[:, 1]
+print('=== METRICAS EN PRODUCCION ===')
+print(f'AUC:       {roc_auc_score(y_true_prod, y_proba_prod):.4f}')
+print(f'Recall:    {recall_score(y_true_prod, y_pred_prod):.4f}')
+print(f'F1:        {f1_score(y_true_prod, y_pred_prod):.4f}')
+
 
 # ==> Generar reporte
 reporte = Report(metrics=[
