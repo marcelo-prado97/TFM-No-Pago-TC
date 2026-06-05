@@ -5,8 +5,6 @@ on:
     branches: [master]
   pull_request:
     branches: [master]
-  schedule:
-    - cron: '0 */2 * * *'  # Cada 2 horas
   workflow_dispatch:
 
 jobs:
@@ -42,12 +40,14 @@ jobs:
           python -c "from api.main import app; print('API OK')"
 
   # ============================================================
-  # JOB 2: Reentrenamiento cada 2 horas
+  # JOB 2: Reentrenamiento solo si hay nuevos datos
   # ============================================================
   reentrenamiento:
     name: Reentrenar Modelo
     runs-on: ubuntu-latest
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && contains(join(github.event.commits.*.modified, ','), 'data/raw/'))
 
     steps:
       - name: Clonar repositorio
